@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import { prisma } from './prisma';
+import { indexRouter } from '../routes/indexRoute';
+import { notFoundMiddleware } from '../middleware/not_found';
+import { globalErrorHandler } from '../middleware/globalErrorHandler';
 
 export const app = express();
 
@@ -40,4 +43,12 @@ app.get("/", async (_req, res) => {
     }
 });
 
+
+//  ---------------- Distribute Routes ----------------
+app.use("/api/v1", indexRouter);
+
+
+// ---------------- Middleware for Error Handling ----------------
+app.use(globalErrorHandler);
+app.use(notFoundMiddleware);
 
