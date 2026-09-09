@@ -1,4 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import z from "zod";
 
 export const catchAsyncError = (fn: RequestHandler) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -14,5 +15,21 @@ export const catchAsyncError = (fn: RequestHandler) => {
             // });
             next(error); // Pass the error to the next middleware (error handler)
         }
+    };
+};
+
+
+
+//  -------------------- For Zod Validation -------------------- //
+export const validateRequest = (schema: z.ZodObject) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+
+        const result = schema.safeParse(req.body);
+        if (!result.success) {
+            next(result.error);   // ZodError instance
+        }
+        req.body = result.data; // Assign the validated data back to req.body
+        next();
+
     };
 };

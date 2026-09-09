@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { Prisma } from "../generated/prisma/client";
+import { ZodError } from "zod";
+import status from "http-status";
 
 export const globalErrorHandler = (
     err: Error | Prisma.PrismaClientKnownRequestError | Prisma.PrismaClientValidationError | Prisma.PrismaClientInitializationError | Prisma.PrismaClientUnknownRequestError,
@@ -21,6 +23,7 @@ export const globalErrorHandler = (
         // 🔥 UNIQUE CONSTRAINT
         if (code === "P2002") {
             return res.status(400).json({
+                status:status.BAD_REQUEST,
                 success: false,
                 type: code,
                 message: "Duplicate value (already exists)",
@@ -146,6 +149,7 @@ export const globalErrorHandler = (
         }
         const combinedMessage = `${field} is ${reason}`;
         return res.status(400).json({
+            status:status.BAD_REQUEST,
             success: false,
             type: "PRISMA_VALIDATION_ERROR",
             field,
@@ -161,6 +165,7 @@ export const globalErrorHandler = (
     // =====================================================
     if (err instanceof Prisma.PrismaClientInitializationError) {
         return res.status(500).json({
+            status:status.INTERNAL_SERVER_ERROR,
             success: false,
             type: err.errorCode || "PRISMA_INIT_ERROR",
             message: err.message,
@@ -173,16 +178,33 @@ export const globalErrorHandler = (
     // =====================================================
     if (err instanceof Prisma.PrismaClientUnknownRequestError) {
         return res.status(500).json({
+            status:status.INTERNAL_SERVER_ERROR,
             success: false,
             type: "PRISMA_UNKNOWN_ERROR",
             message: err.message,
         });
     }
 
+    // ⚪ 5. Zod validation ERROR
+    if (err instanceof ZodError) {
+        const message = err.issues
+            .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+            .join(", ");
+
+        return res.status(400).json({
+            status:status.BAD_REQUEST,
+            success: false,
+            type: "ZOD_VALIDATION_ERROR",
+            message,
+        });
+    }
+
+
     // =====================================================
     // 🔥 5. NON-PRISMA ERROR (FALLBACK)
     // =====================================================
     return res.status(500).json({
+        status:status.INTERNAL_SERVER_ERROR,
         success: false,
         type: "INTERNAL_SERVER_ERROR",
         message: err?.message || "Something went wrong",
