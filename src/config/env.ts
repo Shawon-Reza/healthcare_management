@@ -1,0 +1,51 @@
+import "dotenv/config";
+import { z } from "zod";
+
+const envSchema = z.object({
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
+
+  PORT: z.coerce.number().int().positive().default(5000),
+
+  DATABASE_URL: z
+    .string()
+    .min(1, "DATABASE_URL is required"),
+
+  // Better Auth
+  BETTER_AUTH_SECRET: z
+    .string()
+    .min(1, "BETTER_AUTH_SECRET is required"),
+
+  BETTER_AUTH_URL: z
+    .url("BETTER_AUTH_URL must be a valid URL"),
+
+  // JWT
+  ACCESS_TOKEN_SECRET: z
+    .string()
+    .min(1, "ACCESS_TOKEN_SECRET is required"),
+
+  REFRESH_TOKEN_SECRET: z
+    .string()
+    .min(1, "REFRESH_TOKEN_SECRET is required"),
+
+  ACCESS_TOKEN_EXPIRES_IN: z.string().min(1),
+  REFRESH_TOKEN_EXPIRES_IN: z.string().min(1),
+
+
+
+
+});
+
+const parsedEnv = envSchema.safeParse(process.env);
+
+
+if (!parsedEnv.success) {
+  console.error("❌ Invalid environment variables:");
+
+  console.error(parsedEnv.error.flatten().fieldErrors);
+
+  process.exit(1);
+}
+
+export const env = parsedEnv.data;
