@@ -27,9 +27,21 @@ const getDoctorAllDetails = catchAsyncError(
     }
 )
 
+const getAllDoctors = catchAsyncError(
+    async (req: Request, res: Response,) => {
+        const result = await doctorServices.getAllDoctors();
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            data: result
+        })
+    }
+)
+
 
 
 export const doctorController = {
     createDoctorProfile,
-    getDoctorAllDetails
+    getDoctorAllDetails,
+    getAllDoctors
 }

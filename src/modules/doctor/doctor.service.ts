@@ -110,7 +110,10 @@ const createDoctorProfile = async (doctorProfileData: DoctorProfileData) => {
 
 
 const getDoctorAllDetails = async (doctorId: string) => {
-    console.log("DoctorId", doctorId)
+
+    if (!doctorId) {
+        throw new Error("Doctor ID is required.");
+    }
 
 
 
@@ -137,7 +140,15 @@ const getDoctorAllDetails = async (doctorId: string) => {
 }
 
 
+const getAllDoctors = async () => {  
+    const doctors = await prisma.doctorProfile.findMany()
+    return doctors
+    
+}
+
+
 export const doctorServices = {
     createDoctorProfile,
-    getDoctorAllDetails
+    getDoctorAllDetails,
+    getAllDoctors
 }
