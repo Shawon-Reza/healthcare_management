@@ -4,6 +4,7 @@ import { prisma } from './prisma';
 import { indexRouter } from '../routes/indexRoute';
 import { notFoundMiddleware } from '../middleware/not_found';
 import { globalErrorHandler } from '../middleware/globalErrorHandler';
+import cookieParser from 'cookie-parser';
 
 export const app = express();
 
@@ -13,6 +14,7 @@ app.use(
         origin: ["http://localhost:3000"],
     })
 );
+app.use(cookieParser());
 
 // ---------------- Server Health Check ---------------- 
 
