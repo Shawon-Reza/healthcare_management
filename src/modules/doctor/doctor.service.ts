@@ -1,5 +1,6 @@
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../shared/apErrorClass";
 import { DoctorProfileData } from "./doctor.type"
 
 
@@ -112,7 +113,12 @@ const createDoctorProfile = async (doctorProfileData: DoctorProfileData) => {
 const getDoctorAllDetails = async (doctorId: string) => {
 
     if (!doctorId) {
-        throw new Error("Doctor ID is required.");
+        throw new AppError(
+            400,
+            "Doctor ID is requiredaaaaaaaaa",
+            "BAD_REQUEST",
+            "Custom path: src/modules/doctor/doctor.service.ts ,fn: getDoctorAllDetails"
+        );
     }
 
 
@@ -136,14 +142,23 @@ const getDoctorAllDetails = async (doctorId: string) => {
 
         }
     })
+
+    if (!doctorDetails) {
+        throw new AppError(
+            404,
+            "Doctor not found",
+            "NOT_FOUND",
+            "Custom path: src/modules/doctor/doctor.service.ts ,fn: getDoctorAllDetails"
+        );
+    }
     return doctorDetails;
 }
 
 
-const getAllDoctors = async () => {  
+const getAllDoctors = async () => {
     const doctors = await prisma.doctorProfile.findMany()
     return doctors
-    
+
 }
 
 

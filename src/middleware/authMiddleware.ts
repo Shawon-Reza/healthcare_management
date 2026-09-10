@@ -44,6 +44,18 @@ export const authMiddleware = (allowRoles: string[]) => {
                 }
             );
         }
+        
+        if (
+            typeof tokenVarify !== "string" &&
+            "isDeleted" in tokenVarify &&
+            tokenVarify.isDeleted === true
+        ) {
+            return res.status(401).json({
+                status: status.UNAUTHORIZED,
+                success: false,
+                message: "Unauthorized: User account has been deleted"
+            });
+        }
 
         req.user = tokenVarify as NonNullable<Request["user"]>;
         next();
