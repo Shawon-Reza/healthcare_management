@@ -4,3 +4,11 @@ enum Role {
   SUPER_ADMIN
   DOCTOR
 }
+
+
+enum AppointmentStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+    COMPLETED
+}

@@ -14,10 +14,17 @@ model PatientProfile {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  appointments Appointment[]
+  reviews      Review[]
+
+  medicalReport MedicalReport[]
+
+  @@map("patientprofile")
 }
 
 model DoctorProfile {
-  id     String @id @default(cuid())
+  id String @id @default(cuid())
 
   userId String @unique
   name   String
@@ -41,10 +48,13 @@ model DoctorProfile {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  doctorSpecialization DoctorSpecialty[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  doctorSpecialization DoctorSpecialty[]
+  schedule             DoctorSchedule[]
+  appoinments          Appointment[]
+  reviews              Review[]
 
   @@map("doctorprofile")
 }
