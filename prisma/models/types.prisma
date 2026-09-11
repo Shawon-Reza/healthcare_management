@@ -1,0 +1,6 @@
+enum Role {
+  PATIENT
+  ADMIN
+  SUPER_ADMIN
+  DOCTOR
+}
