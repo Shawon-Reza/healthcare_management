@@ -12,12 +12,7 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  PATIENT
-  ADMIN
-  SUPER_ADMIN
-  DOCTOR
-}
+
 
 enum UserStatus {
   ACTIVE
@@ -28,6 +23,7 @@ enum UserStatus {
 
 model User {
   id            String  @id
+  
   name          String
   email         String
   emailVerified Boolean @default(false)
