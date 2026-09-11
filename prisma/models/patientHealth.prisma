@@ -1,11 +1,12 @@
 
 
+
 model PatientHealthData{
     id String @id @default(uuid())
 
     birthDate DateTime
     gender String
-    bloodGroup String
+    bloodGroup BloodGroup
     hasAllergies Boolean @default(false)
     hasDiabetes Boolean @default(false)
     height  Float

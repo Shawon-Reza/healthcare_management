@@ -1,0 +1,25 @@
+
+enum PaymentStatus {
+    PENDING
+    SUCCESS
+    FAILED
+}
+
+
+model Payment{
+    id String @id @default(uuid())
+    appointmentId String @unique
+
+    amoount Float
+
+    transactionId String
+    paymentStatus PaymentStatus @default(PENDING)
+
+    paymentGetwayData Json
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    appointment Appointment @relation(fields: [appointmentId], references: [id])
+
+}

@@ -19,4 +19,8 @@ model Appointment {
     patient PatientProfile @relation(fields: [patientId], references: [id])
     doctor DoctorProfile @relation(fields: [doctorId], references: [id])
     schedule DoctorSchedule @relation(fields: [scheduleId], references: [id])
+
+
+    prescription Prescription?
+    payment Payment?
 }

@@ -22,6 +22,7 @@ export const authMiddleware = (allowRoles: string[]) => {
             );
         }
         const tokenVarify = jwtUtils.verifyToken(accessToken, env.ACCESS_TOKEN_SECRET);
+        
         console.log("tokenVarify", tokenVarify)
         if (!tokenVarify) {
             return res.status(401).json(
