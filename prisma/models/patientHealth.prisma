@@ -1,0 +1,24 @@
+
+
+model PatientHealthData{
+    id String @id @default(uuid())
+
+    birthDate DateTime
+    gender String
+    bloodGroup String
+    hasAllergies Boolean @default(false)
+    hasDiabetes Boolean @default(false)
+    height  Float
+    weight  Float
+    smokeStatus Boolean @default(false)
+    dietaryHabits String? @default("")
+    hasHeartDisease Boolean @default(false)
+    hasHighBloodPressure Boolean @default(false)
+    hasKidneyDisease Boolean @default(false)    
+    hasPostSurgeryCondition Boolean @default(false)
+    maritalStatus String? @default("")
+
+    isDeleted Boolean @default(false)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
