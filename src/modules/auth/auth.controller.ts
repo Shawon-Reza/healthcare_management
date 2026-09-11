@@ -3,7 +3,6 @@ import { catchAsyncError } from "../../shared/catchAsync";
 import { authService } from "./auth.service";
 import status from "http-status";
 import { tokenUtils } from "../utils/token";
-import { env } from "../../config/env";
 
 
 const signUp = catchAsyncError(
