@@ -23,7 +23,7 @@ async function main() {
         body: {
             name: "superAdmin",
             email,
-            password: "superAdmin@egmail.com",
+            password: "superadmin@egmail.com",
             role: Role.SUPER_ADMIN,
         },
     });

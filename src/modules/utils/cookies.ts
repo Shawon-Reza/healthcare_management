@@ -14,6 +14,7 @@ const getCookie = (req: Request, key: string) => {
 
 
 const clearCookie = (res: Response, key: string, options: CookieOptions) => {
+    
     res.clearCookie(key, options);
 }
 

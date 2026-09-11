@@ -21,7 +21,7 @@ export const catchAsyncError = (fn: RequestHandler) => {
 
 
 //  -------------------- For Zod Validation -------------------- //
-export const validateRequest = (schema: z.ZodObject) => {
+export const zodValidationFN = (schema: z.ZodObject) => {
     return (req: Request, res: Response, next: NextFunction) => {
 
         const result = schema.safeParse(req.body);
