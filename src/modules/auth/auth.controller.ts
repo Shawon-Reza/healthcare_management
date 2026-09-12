@@ -84,6 +84,24 @@ const newTokonFromRefreshToken = catchAsyncError(
 )
 
 
+const updatePassword = catchAsyncError(
+    async (req: Request, res: Response) => {
+        const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+        const payload = req.body;
+
+        const result = await authService.updatePassword(betterAuthSessionToken, payload);
+
+
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            message: "Password updated successfully.",
+            data: result
+        });
+    }
+)
+
+
 const signOut = catchAsyncError(
     async (req: Request, res: Response) => {
         const token = req.cookies["better-auth.session_token"];
@@ -112,20 +130,6 @@ const signOut = catchAsyncError(
             status: status.OK,
             success: true,
             message: "User signed out successfully.",
-        });
-    }
-)
-
-const updatePassword = catchAsyncError(
-    async (req: Request, res: Response) => {
-        // const { currentPassword, newPassword } = req.body;
-
-        // await authService.updatePassword(req.user.id, currentPassword, newPassword);
-
-        res.status(200).json({
-            status: status.OK,
-            success: true,
-            message: "Password updated successfully.",
         });
     }
 )

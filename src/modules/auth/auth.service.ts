@@ -176,11 +176,42 @@ const newTokonFromRefreshToken = async (betterAuthSessionToken: string, refreshT
 
 }
 
-const signOut = async (token : string) => {
+const updatePassword = async (betterAuthSessionToken: string, payload: any) => {
+
+    console.log("Better Auth Session Token in service:", betterAuthSessionToken);
+    console.log("Payload in service:", payload);
+
+    try {
+        const result = await auth.api.changePassword({
+            body: {
+                newPassword: payload.newPassword, // required, The new password to set
+                currentPassword: payload.currentPassword, // required, The current user password
+                revokeOtherSessions: payload.revokeOtherSessions, // When set to true, all other active sessions for this user will be invalidated
+            },
+            // This endpoint requires session cookies.
+            headers: new Headers(
+                {
+                    Authorization: `Bearer ${betterAuthSessionToken}`
+                }
+            ),
+        });
+
+        return result;
+    } catch (error) {
+        console.error("Error updating password:", error);
+        throw new AppError(
+            status.INTERNAL_SERVER_ERROR,
+            ` ${error instanceof Error ? error.message : "Failed to update password."}`,
+            "Password Update Error",
+            "Custom path: src/modules/auth/auth.service.ts ,fn: updatePassword");
+    }
+}
+
+const signOut = async (token: string) => {
     const result = await auth.api.signOut({
         headers: new Headers(
             {
-                Authorization : `Bearer ${token}`
+                Authorization: `Bearer ${token}`
             }
         ),
     });
@@ -192,5 +223,6 @@ export const authService = {
     signUp,
     signIn,
     newTokonFromRefreshToken,
-    signOut
+    signOut,
+    updatePassword
 };
