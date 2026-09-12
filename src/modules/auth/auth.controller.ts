@@ -3,6 +3,8 @@ import { catchAsyncError } from "../../shared/catchAsync";
 import { authService } from "./auth.service";
 import status from "http-status";
 import { tokenUtils } from "../utils/token";
+import { env } from "../../config/env";
+import { cookiesUtils } from "../utils/cookies";
 
 
 const signUp = catchAsyncError(
@@ -22,7 +24,7 @@ const signUp = catchAsyncError(
 
 const signIn = catchAsyncError(
     async (req: Request, res: Response) => {
-     
+
         const { email, password } = req.body;
 
         const result = await authService.signIn(email, password);
@@ -30,7 +32,7 @@ const signIn = catchAsyncError(
         //  ---------------- set cookies ----------------
         tokenUtils.setAccessTokenCookie(res, "accessToken", result.accessToken);
         tokenUtils.setRefreshTokenCookie(res, "refreshToken", result.refreshToken);
-
+        tokenUtils.setBetterAuthTokenCookie(res, "better-auth.session_token", result.token);
 
         res.status(200).json({
             success: true,
@@ -43,6 +45,44 @@ const signIn = catchAsyncError(
 
 )
 
+const newTokonFromRefreshToken = catchAsyncError(
+    async (req: Request, res: Response) => {
+
+        const refreshToken = req.cookies["refreshToken"];
+        const betterAuthSessionToken = req.cookies["better-auth.session_token"];
+        const result = await authService.newTokonFromRefreshToken(betterAuthSessionToken,refreshToken,req.user);
+
+
+
+        cookiesUtils.setCookie(res, "accessToken", result.accessToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 60*60*24 * 1000 // 1 day
+        });
+        cookiesUtils.setCookie(res, "refreshToken", result.refreshToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 60*60*24 * 1000 // 1 day
+        });
+        cookiesUtils.setCookie(res, "better-auth.session_token", result.betterAuthTokenUpdate.token, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 60*60*24 * 1000 // 1 day
+        });
+
+
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            message: "New tokens generated successfully.",
+            data: result
+        });
+    }
+)
+
 
 
 
@@ -50,4 +90,5 @@ const signIn = catchAsyncError(
 export const authController = {
     signUp,
     signIn,
+    newTokonFromRefreshToken
 };

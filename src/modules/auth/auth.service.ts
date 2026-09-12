@@ -1,6 +1,11 @@
+import status from "http-status";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../shared/apErrorClass";
+import { jwtUtils } from "../utils/jwtUtils";
 import { tokenUtils } from "../utils/token";
+import { env } from "../../config/env";
+
 
 type SignUpPayload = {
     name: string;
@@ -104,10 +109,77 @@ const signIn = async (email: string, password: string) => {
     };
 }
 
+const newTokonFromRefreshToken = async (betterAuthSessionToken: string, refreshToken: string, user: any) => {
+    console.log("Better Auth Session Token in service:", betterAuthSessionToken);
+    console.log("Refresh token in service:", refreshToken);
+    console.log("User in service:", user);
+    try {
+
+        const verifyRefreshToken = jwtUtils.verifyToken(refreshToken, env.REFRESH_TOKEN_SECRET);
+        console.log("Verify refresh token:", verifyRefreshToken);
+
+        // --------------------- Access Token and Refresh Token Generation ---------------------
+        const newAccessToken = tokenUtils.createAccessToken({
+            userId: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            isDeleted: user.isDeleted,
+            needPasswordChange: user.needPasswordChange,
+
+        });
+        const newRefreshToken = tokenUtils.createRefreshToken({
+            userId: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            isDeleted: user.isDeleted,
+            needPasswordChange: user.needPasswordChange,
+        });
+
+
+        const betterAuthTokenUpdate = await prisma.session.update({
+            where: {
+                token: betterAuthSessionToken
+            },
+            data: {
+                token: newRefreshToken,
+                expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // Set expiration to 1 days from now
+            },
+
+        })
+
+        console.log("Better Auth Token Update Result:", betterAuthTokenUpdate);
+
+        console.log("New Access Token:", newAccessToken);
+        console.log("New Refresh Token:", newRefreshToken);
+
+
+
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            betterAuthTokenUpdate
+        }
+
+
+
+    } catch (error) {
+        console.error("Error verifying refresh token:", error);
+        throw new AppError(
+            status.UNAUTHORIZED,
+            "Invalid refresh token.",
+            "Token verification Error",
+            "Custom path: src/modules/auth/auth.service.ts ,fn: newTokonFromRefreshToken");
+    }
+
+}
+
 
 
 
 export const authService = {
     signUp,
     signIn,
+    newTokonFromRefreshToken
 };
