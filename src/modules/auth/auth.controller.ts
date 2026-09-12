@@ -50,7 +50,7 @@ const newTokonFromRefreshToken = catchAsyncError(
 
         const refreshToken = req.cookies["refreshToken"];
         const betterAuthSessionToken = req.cookies["better-auth.session_token"];
-        const result = await authService.newTokonFromRefreshToken(betterAuthSessionToken,refreshToken,req.user);
+        const result = await authService.newTokonFromRefreshToken(betterAuthSessionToken, refreshToken, req.user);
 
 
 
@@ -58,19 +58,19 @@ const newTokonFromRefreshToken = catchAsyncError(
             httpOnly: true,
             secure: env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 60*60*24 * 1000 // 1 day
+            maxAge: 60 * 60 * 24 * 1000 // 1 day
         });
         cookiesUtils.setCookie(res, "refreshToken", result.refreshToken, {
             httpOnly: true,
             secure: env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 60*60*24 * 1000 // 1 day
+            maxAge: 60 * 60 * 24 * 1000 // 1 day
         });
         cookiesUtils.setCookie(res, "better-auth.session_token", result.betterAuthTokenUpdate.token, {
             httpOnly: true,
             secure: env.NODE_ENV === "production",
             sameSite: "strict",
-            maxAge: 60*60*24 * 1000 // 1 day
+            maxAge: 60 * 60 * 24 * 1000 // 1 day
         });
 
 
@@ -84,11 +84,58 @@ const newTokonFromRefreshToken = catchAsyncError(
 )
 
 
+const signOut = catchAsyncError(
+    async (req: Request, res: Response) => {
+        const token = req.cookies["better-auth.session_token"];
+        const result = await authService.signOut(token);
 
+        console.log("Sign out result:", result);
+        // Clear cookies
+        cookiesUtils.clearCookie(res, "accessToken", {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+        }
+        );
+        cookiesUtils.clearCookie(res, "refreshToken", {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+        }
+        );
+        cookiesUtils.clearCookie(res, "better-auth.session_token", {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+        }
+        );
+
+
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            message: "User signed out successfully.",
+        });
+    }
+)
+
+const updatePassword = catchAsyncError(
+    async (req: Request, res: Response) => {
+        // const { currentPassword, newPassword } = req.body;
+
+        // await authService.updatePassword(req.user.id, currentPassword, newPassword);
+
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            message: "Password updated successfully.",
+        });
+    }
+)
 
 
 export const authController = {
     signUp,
     signIn,
-    newTokonFromRefreshToken
+    newTokonFromRefreshToken,
+    signOut,
+    updatePassword
+
 };

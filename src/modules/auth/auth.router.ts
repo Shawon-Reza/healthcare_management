@@ -8,8 +8,12 @@ export const authRouter = Router();
 
 authRouter.post("/signup", authController.signUp);
 authRouter.post("/signIn", authController.signIn);
+authRouter.post("/signOut", authController.signOut);
+authRouter.patch("/updatePassword", authController.updatePassword);
+
 
 
 
 authRouter.get("/newTokens", authMiddleware([Role.ADMIN, Role.DOCTOR, Role.SUPER_ADMIN, Role.PATIENT]), authController.newTokonFromRefreshToken);
+
 
