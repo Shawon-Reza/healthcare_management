@@ -11,6 +11,10 @@ authRouter.post("/signIn", authController.signIn);
 authRouter.post("/signOut", authController.signOut);
 authRouter.patch("/updatePassword", authController.updatePassword);
 
+authRouter.post("/reset-password", authController.resetPassword);
+authRouter.post("/reset_password_with_otp", authController.reset_password_with_otp);
+
+
 
 
 

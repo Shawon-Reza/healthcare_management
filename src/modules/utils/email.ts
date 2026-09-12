@@ -6,10 +6,6 @@ import { AppError } from "../../shared/apErrorClass";
 import path from "node:path";
 import ejs from "ejs";
 
-
-
-
-
 // Create a transporter using SMTP
 export const transporter = nodemailer.createTransport({
     host: env.SMTP_HOST,
@@ -20,7 +16,6 @@ export const transporter = nodemailer.createTransport({
         pass: env.SMTP_PASS,
     },
 });
-
 
 export interface EmailOptions {
     to: string;
@@ -38,6 +33,7 @@ export interface EmailOptions {
 
 export const sendEmail = async ({ to, subject, template, templateName, templateData, attachments }: EmailOptions) => {
     try {
+        
         const templatePath = path.resolve(process.cwd(), `src/email_templates${templateName}.ejs`);
 
         const html = await ejs.renderFile(templatePath, templateData)
