@@ -30,6 +30,8 @@ const createRefreshToken = (payload: JwtPayload) => {
 };
 
 
+
+// ----------------------- set cookie -----------------------
 const setAccessTokenCookie = (res: Response, key: string, value: string) => {
     cookiesUtils.setCookie(res, key, value,
         {
@@ -54,17 +56,17 @@ const setRefreshTokenCookie = (res: Response, key: string, value: string) => {
     );
 }
 
-// const setBetterAuthTokenCookie = (res: Response, key: string, value: string) => {
-//     cookiesUtils.setCookie(res, key, value,
-//         {
-//             httpOnly: true,  // JS can't read
-//             secure: false,  // true in HTTPS production
-//             sameSite: "none", // cross-site rule
-//             maxAge: 15 * 60 * 1000, // 15 minutes
-//             path: "/",       // all routes
-//         }
-//     );
-// }
+const setBetterAuthTokenCookie = (res: Response, key: string, value: string) => {
+    cookiesUtils.setCookie(res, key, value,
+        {
+            httpOnly: true,  // JS can't read
+            secure: false,  // true in HTTPS production
+            sameSite: "none", // cross-site rule
+            maxAge: 60 * 60 * 24 * 1000, // 7day
+            path: "/",       // all routes
+        }
+    );
+}
 
 
 export const tokenUtils = {
@@ -72,5 +74,5 @@ export const tokenUtils = {
     createRefreshToken,
     setAccessTokenCookie,
     setRefreshTokenCookie,
-    // setBetterAuthTokenCookie
+    setBetterAuthTokenCookie
 };
