@@ -76,6 +76,7 @@ const signUp = async (payload: SignUpPayload) => {
 
 
 const signIn = async (email: string, password: string) => {
+    
     const result = await auth.api.signInEmail({
         body: {
             email, password

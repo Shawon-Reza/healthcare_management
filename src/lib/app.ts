@@ -5,6 +5,8 @@ import { indexRouter } from '../routes/indexRoute';
 import { notFoundMiddleware } from '../middleware/not_found';
 import { globalErrorHandler } from '../middleware/globalErrorHandler';
 import cookieParser from 'cookie-parser';
+import { toNodeHandler } from 'better-auth/node';
+import { auth } from './auth';
 
 export const app = express();
 
@@ -15,7 +17,7 @@ app.use(
     })
 );
 app.use(cookieParser());
-
+app.all('/api/auth/{*any}', toNodeHandler(auth));
 // ---------------- Server Health Check ---------------- 
 
 app.get("/", async (_req, res) => {
