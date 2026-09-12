@@ -17,6 +17,19 @@ type SignUpPayload = {
 
 const signUp = async (payload: SignUpPayload) => {
 
+    const existance = await prisma.user.findUnique({
+        where: { email: payload.email }
+    });
+
+    if (existance) {
+        throw new AppError(
+            status.CONFLICT,
+            "User with this email already exists.",
+            "User Already Exists",
+            "Custom path: src/modules/auth/auth.service.ts ,fn: signUp"
+        );
+    }
+
     const { name, email, password } = payload;
     const result = await auth.api.signUpEmail({
         body: {
@@ -65,24 +78,31 @@ const signUp = async (payload: SignUpPayload) => {
 
     })
 
-
+    const sendSignInOTP = await auth.api.sendVerificationOTP({
+        body: {
+            email: result.user.email, // required, Email address to send the OTP.
+            type: "sign-in", // required, Type of the OTP. `sign-in`, `email-verification`, or `forget-password`.
+        },
+    });
     return {
         accessToken,
         refreshToken,
         ...result,
-        patient
+        patient,
+        sendSignInOTP
     };
 }
 
 
 const signIn = async (email: string, password: string) => {
-    
+    console.log("From signIn service:----------------------------")
     const result = await auth.api.signInEmail({
         body: {
             email, password
         },
     });
 
+    console.log("From signIn service: ---------------------", result)
     // --------------------- Access Token and Refresh Token Generation ---------------------
     const accessToken = tokenUtils.createAccessToken({
         userId: result.user.id,
@@ -208,6 +228,35 @@ const updatePassword = async (betterAuthSessionToken: string, payload: any) => {
     }
 }
 
+const resetPassword = async (email: string) => {
+    console.log("Email in resetPassword service:", email);
+
+    console.log("from resetPassword service:----------------------------");
+
+    const result = await auth.api.requestPasswordResetEmailOTP({
+        body: {
+            email: email, // required, Email address to send the OTP.
+        },
+    });
+
+
+
+    return result;
+}
+
+const reset_password_with_otp = async (email: string, otp: string, newPassword: string) => {
+    const result = await auth.api.resetPasswordEmailOTP({
+        body: {
+            email: email, // required, Email address to reset the password.
+            otp: otp, // required, OTP sent to the email.
+            password: newPassword, // required, New password.
+        },
+
+    });
+    console.log("Reset password with OTP result:", result);
+    return result;
+}
+
 const signOut = async (token: string) => {
     const result = await auth.api.signOut({
         headers: new Headers(
@@ -225,5 +274,8 @@ export const authService = {
     signIn,
     newTokonFromRefreshToken,
     signOut,
-    updatePassword
+    updatePassword,
+    resetPassword,
+    reset_password_with_otp
+
 };

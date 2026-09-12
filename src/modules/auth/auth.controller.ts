@@ -24,9 +24,7 @@ const signUp = catchAsyncError(
 
 const signIn = catchAsyncError(
     async (req: Request, res: Response) => {
-
         const { email, password } = req.body;
-        console.log("SignIn Ip:",  req.ip, req.ips, req.hostname, req.originalUrl, req.protocol, req.secure, req.subdomains, req.xhr);
 
         const result = await authService.signIn(email, password);
 
@@ -102,6 +100,35 @@ const updatePassword = catchAsyncError(
     }
 )
 
+const resetPassword = catchAsyncError(
+    async (req: Request, res: Response) => {
+        const { email } = req.body;
+
+        const result = await authService.resetPassword(email);
+
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            message: "Password reset OTP sent successfully.Please check your email for the OTP.",
+            data: result
+        });
+    }
+)
+
+const reset_password_with_otp = catchAsyncError(
+    async (req: Request, res: Response) => {
+        const { email, otp, newPassword } = req.body;
+
+        const result = await authService.reset_password_with_otp(email, otp, newPassword);
+
+        res.status(200).json({
+            status: status.OK,
+            success: true,
+            message: "Password reset successfully.",
+            data: result
+        });
+    }
+)
 
 const signOut = catchAsyncError(
     async (req: Request, res: Response) => {
@@ -141,6 +168,8 @@ export const authController = {
     signIn,
     newTokonFromRefreshToken,
     signOut,
-    updatePassword
+    updatePassword,
+    resetPassword,
+    reset_password_with_otp
 
 };

@@ -16,20 +16,28 @@ export const auth = betterAuth({
     plugins: [
         bearer(),
         emailOTP({
+            otpLength: 8,
+            expiresIn: 300,
+            allowedAttempts: 1,
             overrideDefaultEmailVerification: true,
+
+
             async sendVerificationOTP({ email, otp, type }) {
                 console.log(`Sending OTP to ${email}: ${otp} for ${type}`);
+                // ------------------ get user by email ------------------
+                const user = await prisma.user.findUnique({
+                    where: { email },
+                });
+
                 if (type === "sign-in") {
                     // Send the OTP for sign in
                 } else if (type === "email-verification") {
                     // Send the OTP for email verification
                     try {
-                        const user = await prisma.user.findUnique({
-                            where: { email },
-                        });
+
 
                         if (user && !user.emailVerified) {
-                            sendEmail(
+                            await sendEmail(
                                 {
                                     to: email,
                                     subject: "Email Verification OTP",
@@ -37,7 +45,7 @@ export const auth = betterAuth({
                                     templateName: "/otp",
                                     templateData: {
                                         otp,
-                                        userName: user.name,
+                                        userName: user?.name,
                                     }
                                 }
                             );
@@ -47,8 +55,25 @@ export const auth = betterAuth({
                     }
 
 
-                } else {
+                } else if (type === "forget-password") {
                     // Send the OTP for password reset
+                    try {
+                        await sendEmail(
+                            {
+                                to: email,
+                                subject: "Password Reset OTP",
+                                template: "password_reset",
+                                templateName: "/password_reset",
+                                templateData: {
+                                    otp,
+                                    userName: user?.name,
+                                }
+                            }
+                        );
+                    } catch (error) {
+                        console.error("Error sending forget password OTP:", error);
+                        throw new Error("Failed to send forget password OTP", { cause: error });
+                    }
                 }
             },
         })
