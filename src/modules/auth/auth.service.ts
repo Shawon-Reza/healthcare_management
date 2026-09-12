@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from "http-status";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
@@ -175,11 +176,21 @@ const newTokonFromRefreshToken = async (betterAuthSessionToken: string, refreshT
 
 }
 
-
+const signOut = async (token : string) => {
+    const result = await auth.api.signOut({
+        headers: new Headers(
+            {
+                Authorization : `Bearer ${token}`
+            }
+        ),
+    });
+    return result;
+}
 
 
 export const authService = {
     signUp,
     signIn,
-    newTokonFromRefreshToken
+    newTokonFromRefreshToken,
+    signOut
 };
