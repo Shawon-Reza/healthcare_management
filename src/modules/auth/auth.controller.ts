@@ -26,6 +26,7 @@ const signIn = catchAsyncError(
     async (req: Request, res: Response) => {
 
         const { email, password } = req.body;
+        console.log("SignIn Ip:",  req.ip, req.ips, req.hostname, req.originalUrl, req.protocol, req.secure, req.subdomains, req.xhr);
 
         const result = await authService.signIn(email, password);
 
