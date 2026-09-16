@@ -268,6 +268,84 @@ const signOut = async (token: string) => {
     return result;
 }
 
+const googleSignInSuccess = async (session: Record<string, any>) => {
+    // console.log("Session from Google Sign-In:", session);
+
+    const isPatientExists = await prisma.patientProfile.findUnique({
+        where: {
+            userId: session.user.id,
+        },
+        include: {
+            user: true, // Include the related user data
+        },
+    })
+
+    console.log("isPatientExists: From services", isPatientExists);
+
+    if (isPatientExists) {
+        const accessToken = tokenUtils.createAccessToken({
+            userId: isPatientExists.user.id,
+            email: isPatientExists.user.email,
+            name: isPatientExists.user.name,
+            role: isPatientExists.user.role,
+            isDeleted: isPatientExists.user.isDeleted,
+            needPasswordChange: isPatientExists.user.needPasswordChange,
+
+        });
+        const refreshToken = tokenUtils.createRefreshToken({
+            userId: isPatientExists.user.id,
+            email: isPatientExists.user.email,
+            name: isPatientExists.user.name,
+            role: isPatientExists.user.role,
+            isDeleted: isPatientExists.user.isDeleted,
+            needPasswordChange: isPatientExists.user.needPasswordChange,
+        });
+        return {
+            accessToken,
+            refreshToken,
+            isPatientExists
+        }
+    }
+
+
+    const patientProfile = await prisma.patientProfile.create({
+        data: {
+            userId: session.user.id,
+            name: session.user.name,
+            email: session.user.email,
+        },
+        include: {
+            user: true
+        }
+
+    });
+
+    const accessToken = tokenUtils.createAccessToken({
+        userId: patientProfile.user.id,
+        email: patientProfile.user.email,
+        name: patientProfile.user.name,
+        role: patientProfile.user.role,
+        isDeleted: patientProfile.user.isDeleted,
+        needPasswordChange: patientProfile.user.needPasswordChange,
+
+    });
+    const refreshToken = tokenUtils.createRefreshToken({
+        userId: patientProfile.user.id,
+        email: patientProfile.user.email,
+        name: patientProfile.user.name,
+        role: patientProfile.user.role,
+        isDeleted: patientProfile.user.isDeleted,
+        needPasswordChange: patientProfile.user.needPasswordChange,
+    });
+
+
+    return {
+        accessToken,
+        refreshToken,
+        patientProfile
+    }
+}
+
 
 export const authService = {
     signUp,
@@ -276,6 +354,7 @@ export const authService = {
     signOut,
     updatePassword,
     resetPassword,
-    reset_password_with_otp
+    reset_password_with_otp,
+    googleSignInSuccess
 
 };

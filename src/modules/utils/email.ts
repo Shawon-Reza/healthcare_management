@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // import nodemailer, { SendMailOptions } from "nodemailer";
 import nodemailer, { SendMailOptions } from "nodemailer";
 import { env } from "../../config/env";

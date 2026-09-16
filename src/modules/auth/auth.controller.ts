@@ -5,6 +5,7 @@ import status from "http-status";
 import { tokenUtils } from "../utils/token";
 import { env } from "../../config/env";
 import { cookiesUtils } from "../utils/cookies";
+import { auth } from "../../lib/auth";
 
 
 const signUp = catchAsyncError(
@@ -130,6 +131,70 @@ const reset_password_with_otp = catchAsyncError(
     }
 )
 
+// ---------------------- Goole Login ----------------------
+
+const googleSignIn = catchAsyncError(
+    async (req: Request, res: Response) => {
+
+        const redirectUrl = req.query.redirectUrl as string
+        const encodedRedirectUrl = encodeURIComponent(redirectUrl);
+
+        const callbackURL = `${env.BETTER_AUTH_URL}/api/v1/auth/googleSignIn/success?redirect=${encodedRedirectUrl}`;
+
+        console.log("Redirect URL:", redirectUrl);
+        console.log("callback URL:", callbackURL);
+
+
+
+
+        res.render("googleRedirect", {
+            callbackURL: callbackURL,
+            betterAuthUrl: env.BETTER_AUTH_URL,
+        })
+
+
+    }
+)
+
+const googleSignInSuccess = catchAsyncError(
+    async (req: Request, res: Response) => {
+        const redirectUrl = req.query.redirect as string;
+        const encodedRedirectUrl = encodeURIComponent(redirectUrl);
+
+        const sessionToken = req.cookies["better-auth.session_token"];
+
+
+        if (!sessionToken) {
+            return res.redirect(`${env.FRONTEND_URL}/login?error=oauth_failed`);
+        }
+
+        const session = await auth.api.getSession({
+            headers: {
+                cookie: `better-auth.session_token=${sessionToken}`
+            }
+        });
+
+        if (!session || !session.user) {
+            return res.redirect(`${env.FRONTEND_URL}/login?error=oauth_failed`);
+        }
+
+        const result = await authService.googleSignInSuccess(session);
+
+
+        cookiesUtils.setCookie(res, "accessToken", result.accessToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+        });
+        cookiesUtils.setCookie(res, "refreshToken", result.refreshToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+        });
+
+        // return res.redirect(`${env.FRONTEND_URL}/login?error=oauth_failed`);
+         res.redirect(`${env.FRONTEND_URL}/${encodedRedirectUrl}?accessToken=${result.accessToken}&refreshToken=${result.refreshToken}`);
+    }
+)
+
 const signOut = catchAsyncError(
     async (req: Request, res: Response) => {
         const token = req.cookies["better-auth.session_token"];
@@ -170,6 +235,8 @@ export const authController = {
     signOut,
     updatePassword,
     resetPassword,
-    reset_password_with_otp
+    reset_password_with_otp,
+    googleSignIn,
+    googleSignInSuccess
 
 };

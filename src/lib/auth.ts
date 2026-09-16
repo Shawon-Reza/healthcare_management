@@ -3,12 +3,14 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 import { bearer, emailOTP } from "better-auth/plugins";
 import { sendEmail } from "../modules/utils/email";
+import { env } from "../config/env";
 
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
         provider: "postgresql", // or "mysql", "sqlite", ...etc
     }),
+    baseURL: env.BETTER_AUTH_URL,
     // session: {
     //     expiresIn: 60 * 60 * 24 * 7, // 7 days
     //     updateAge: 60 * 60 * 24 // 1 day (every 1 day the session expiration is updated)
@@ -90,6 +92,16 @@ export const auth = betterAuth({
         sendOnSignIn: true,
         autoSignInAfterVerification: true,
     },
+    
+    // ------------------ social login configuration ------------------
+    socialProviders: {
+        google: {
+            prompt: "select_account",
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+        },
+    },
+
 
 
 
@@ -131,6 +143,7 @@ export const auth = betterAuth({
 
     trustedOrigins: [
         "http://localhost:3000",
+        "http://localhost:5173"
     ],
 
 

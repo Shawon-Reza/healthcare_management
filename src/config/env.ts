@@ -37,9 +37,9 @@ const envSchema = z.object({
   SMTP_USER: z.string().min(1, "SMTP_USER is required"),
   SMTP_PASS: z.string().min(1, "SMTP_PASS is required"),
 
-
-
-
+  GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
+  GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
+  FRONTEND_URL: z.string().url("FRONTEND_URL must be a valid URL"),
 
 });
 

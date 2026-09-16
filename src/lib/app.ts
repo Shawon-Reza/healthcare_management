@@ -7,17 +7,28 @@ import { globalErrorHandler } from '../middleware/globalErrorHandler';
 import cookieParser from 'cookie-parser';
 import { toNodeHandler } from 'better-auth/node';
 import { auth } from './auth';
+import path from 'node:path';
 
 export const app = express();
 
 app.use(express.json());
 app.use(
     cors({
-        origin: ["http://localhost:3000"],
+        origin: [
+            "http://localhost:3000",
+            "http://localhost:5173"
+        ],
+        credentials: true,
     })
 );
 app.use(cookieParser());
 app.all('/api/auth/{*any}', toNodeHandler(auth));
+
+//  ----------- ejs template ----------------
+app.set('view engine', 'ejs');
+app.set('views', path.resolve(process.cwd(), 'src/email_templates'));
+
+
 // ---------------- Server Health Check ---------------- 
 
 app.get("/", async (_req, res) => {
