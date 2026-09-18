@@ -8,6 +8,9 @@ import { catchAsyncError } from "../../shared/catchAsync";
 const createSpecialty = catchAsyncError(
     async (req: Request, res: Response) => {
 
+        console.log("From specialty.controller.ts - Request Body:", req.body, );
+        
+
         const result = await specialtyService.createSpecialty(req.body);
 
         res.status(201).json({

@@ -1,6 +1,4 @@
 import { Router } from "express";
-import { zodValidationFN } from "../../shared/catchAsync";
-import { createAdminPayload } from "./admin.zodSchema";
 import { adminController } from "./admin.controllers";
 import { authMiddleware } from "../../middleware/authMiddleware";
 import { Role } from './../../generated/prisma/enums';
@@ -12,7 +10,8 @@ export const adminRouter = Router();
 
 
 
-adminRouter.post("/createAdmin", authMiddleware([Role.ADMIN, Role.SUPER_ADMIN]), zodValidationFN(createAdminPayload), adminController.createAdmin);
+adminRouter.post("/createAdmin",
+    authMiddleware([Role.ADMIN, Role.SUPER_ADMIN]), adminController.createAdmin);
 
 adminRouter.delete("/:id", authMiddleware([Role.ADMIN, Role.SUPER_ADMIN]), adminController.deleteAdmin);
 

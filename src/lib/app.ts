@@ -21,6 +21,7 @@ app.use(
         credentials: true,
     })
 );
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.all('/api/auth/{*any}', toNodeHandler(auth));
 
