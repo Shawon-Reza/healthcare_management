@@ -1,3 +1,4 @@
+import { cloudinaryDelete } from "../../config/cloudinary";
 import { Prisma, Specialty } from "../../generated/prisma/browser";
 import { prisma } from "../../lib/prisma";
 
@@ -7,11 +8,15 @@ import { prisma } from "../../lib/prisma";
 const createSpecialty = async (specialtyData: Prisma.SpecialtyCreateInput): Promise<Specialty> => {
     try {
         // const { title } = specialtyData;
+        console.log("Creating specialty with specialtyData:", specialtyData);
         const result = await prisma.specialty.create({
             data: specialtyData,
         });
         return result;
     } catch (error) {
+        // If there's an error, delete the uploaded file from Cloudinary
+        await cloudinaryDelete(specialtyData.icon || ""); // Delete the file from Cloudinary if it exists
+
         throw new Error("Failed to create specialty, please try again.", {
             cause: error,
         });
@@ -38,17 +43,17 @@ const deleteSpecialty = async (specialtyId: string, specialtyTitle: string) => {
         console.log("Deleting specialty with ID:", specialtyId, "and title:", specialtyTitle);
 
 
-        let where: Prisma.SpecialtyWhereUniqueInput=specialtyId ? { id: specialtyId } : { title: specialtyTitle }; 
+        let where: Prisma.SpecialtyWhereUniqueInput = specialtyId ? { id: specialtyId } : { title: specialtyTitle };
 
-        if(specialtyId){
-            where={id:specialtyId}
+        if (specialtyId) {
+            where = { id: specialtyId }
         }
-        if( !specialtyId && specialtyTitle){
-            where={title:specialtyTitle}
+        if (!specialtyId && specialtyTitle) {
+            where = { title: specialtyTitle }
         }
 
         const result = await prisma.specialty.delete({
-            where 
+            where
         })
         return result;
 

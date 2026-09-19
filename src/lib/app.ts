@@ -30,6 +30,15 @@ app.set('view engine', 'ejs');
 app.set('views', path.resolve(process.cwd(), 'src/email_templates'));
 
 
+// ---------------- Stripe Webhook ----------------
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+    // Handle the webhook event here
+    console.log('Received webhook event:', req.body);
+    res.status(200).send('Webhook received');
+});
+
+
+
 // ---------------- Server Health Check ---------------- 
 
 app.get("/", async (_req, res) => {

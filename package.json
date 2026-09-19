@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/server.ts",
-    "lint": "eslint ./src "
+    "lint": "eslint ./src ",
+    "stripe:webhook": "stripe listen --all-snapshot --forward-to localhost:5000/webhook"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "@types/node": "^26.4.1",
     "@types/nodemailer": "^8.0.1",
     "@types/pg": "^8.23.1",
+    "@types/stripe": "^8.0.417",
     "cors": "^2.8.6",
     "eslint": "^10.10.0",
     "prisma": "7.10.0",
@@ -53,6 +55,7 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^10.0.3",
     "pg": "^8.23.0",
+    "stripe": "^22.6.2",
     "zod": "^4.5.4"
   }
 }
