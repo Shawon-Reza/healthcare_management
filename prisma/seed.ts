@@ -5,7 +5,10 @@ import { auth } from "../src/lib/auth";
 import { Role } from "../src/generated/prisma/enums";
 
 async function main() {
+
     
+
+    // #Admin Seeding:
     const email = "superadmin@egmail.com";
 
     const existingUser = await prisma.user.findUnique({
@@ -29,6 +32,7 @@ async function main() {
     });
 
     console.log("Super Admin created:", superAdmin);
+
 }
 
 main()

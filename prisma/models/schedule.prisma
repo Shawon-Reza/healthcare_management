@@ -1,16 +1,17 @@
 model Schedule {
-    id              String   @id @default(uuid())
-    startTime       DateTime
-    endTime         DateTime
-    startTimeString String   @default("")
-    endTimeString   String   @default("")
+    id              String @id @default(uuid())
+    // startTime       DateTime
+    // endTime         DateTime
+    startTimeString String @default("")
+    endTimeString   String @default("")
+    interval        Int // in minutes
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     schedule DoctorSchedule[]
 
-    @@index([startTime, endTime])
+    // @@index([startTime, endTime])
     @@map("schedule")
 }
 
@@ -20,16 +21,16 @@ model DoctorSchedule {
     doctorId   String
     scheduleId String
 
+    date DateTime
+
     isBooked Boolean @default(false)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    doctor DoctorProfile @relation(fields: [doctorId], references: [id])
-
-    schedule Schedule @relation(fields: [scheduleId], references: [id])
-
-    appointments Appointment[] 
+    doctor       DoctorProfile @relation(fields: [doctorId], references: [id])
+    schedule     Schedule      @relation(fields: [scheduleId], references: [id])
+    appointments Appointment[]
 
     @@index([doctorId, scheduleId])
     @@map("doctor_schedule")
